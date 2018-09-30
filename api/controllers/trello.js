@@ -116,7 +116,6 @@ const createCardRequest = async (chatId, boardName, name, desc, assignees, due_o
     for (const index in assignees) {
       const assignee = assignees[index];
       const member = members.find((member) => {
-        console.log(member.username, assignee.login.toLowerCase(), member.username === assignee.login.toLowerCase())
         return member.username === assignee.login.toLowerCase();
       });
       if (member === undefined) { continue; }
@@ -124,7 +123,9 @@ const createCardRequest = async (chatId, boardName, name, desc, assignees, due_o
     }
     for (const index in comments) {
       const comment = comments[index];
-      await addCommentToCard(card.id, `${comment.body}\n${comment.html_url}`, credentials);
+      const body = (comment.body.length > 512) ? `${comment.body.substring(0, 512)}...` : comment.body;
+      const commentText = `${body}\n${comment.html_url}`;
+      await addCommentToCard(card.id, commentText, credentials);
     }
   } catch(e) {
     throw(e);

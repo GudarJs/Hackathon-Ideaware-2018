@@ -63,14 +63,36 @@ const getIssuesFromResporitory = async (chatId, owner, repository) => {
     if (!chat) {
       throw(new Error('This chat is not registered, please use the /setup command and configure the integrations.'));
     }
-    console.log(`https://api.github.com/repos/${owner}/${repository}/issues?access_token=${chat.github_access_token}`)
-    const response = await axios.get(`https://api.github.com/repos/${owner}/${repository}/issues?access_token=${chat.github_access_token}`);
+    
+    const response = await axios.get(`https://api.github.com/repos/${owner}/${repository}/issues?access_token=${chat.github_access_token}&per_page=100`);
 
     // Filter issues that are pull request
     // because the api endpoint give us issues + pull requests.
-    return response.data.filter((issue) => {
+    const issues = response.data.filter((issue) => {
       return !issue.pull_request;
     });
+    return {
+      data: issues,
+      link: response.headers.link,
+    }
+  } catch (e) {
+    throw(e);
+  }
+};
+
+const getIssuesFromResporitoryByURL = async (url) => {
+  try {
+    const response = await axios.get(url);
+
+    // Filter issues that are pull request
+    // because the api endpoint give us issues + pull requests.
+    const issues = response.data.filter((issue) => {
+      return !issue.pull_request;
+    });
+    return {
+      data: issues,
+      link: response.headers.link,
+    }
   } catch (e) {
     throw(e);
   }
@@ -93,5 +115,6 @@ module.exports = {
   login,
   callback,
   getIssuesFromResporitory,
+  getIssuesFromResporitoryByURL,
   getCommentsFromIssue,
 }

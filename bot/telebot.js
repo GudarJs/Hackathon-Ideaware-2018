@@ -16,7 +16,6 @@ class Android18 {
         this.bot.on('/setup', setupHandler);
         this.bot.on(/^\/board (.+)$/, createTrelloBoardHandler);
         this.bot.on(/^\/sync (.+)$/, moveIssuesHandler);
-        // TODO: Implement a /help command that gives a guide about how to use the bot
         
         this.bot.start();
     }
