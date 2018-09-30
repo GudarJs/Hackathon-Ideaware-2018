@@ -26,7 +26,7 @@ Features
 - Send comments from Github issue to Trello card automatically.
 - Support for public/private Github repositories.
 - Ability to manage multiples boards and repositories.
-- Tested with the keras repository (1880 issues) https://github.com/keras-team/keras. proof: 
+- Tested with the keras repository (1880 issues) https://github.com/keras-team/keras. proof: https://trello.com/b/lPAQs0iQ/keras
 
 How to run the bot server?
 ---------------------------
