@@ -7,20 +7,21 @@ const boardModel = require('../models/board');
 const listModel = require('../models/list');
 
 
-const requestURL = "https://trello.com/1/OAuthGetRequestToken";
-const accessURL = "https://trello.com/1/OAuthGetAccessToken";
-const authorizeURL = "https://trello.com/1/OAuthAuthorizeToken";
-const appName = "Scrum Android18 Bot";
-
-const { api_key, api_secret } = Settings.getConfig().trello;
-
-// Trello redirects the user here after authentication
-const loginCallback = `http://localhost:3000/trello-callback`;
+const config = Settings.getConfig();
+const { appName } = config;
+const {
+  apiKey,
+  apiSecret,
+  requestURL,
+  accessURL,
+  authorizeURL,
+  loginCallback
+} = config.trello;
 
 const oauth_secrets = {};
 const chat_ids = {};
 
-const oauth = new OAuth(requestURL, accessURL, api_key, api_secret, "1.0A", loginCallback, "HMAC-SHA1");
+const oauth = new OAuth(requestURL, accessURL, apiKey, apiSecret, "1.0A", loginCallback, "HMAC-SHA1");
 
 const login = (req, res) => {
   oauth.getOAuthRequestToken(function(error, token, tokenSecret, results){
@@ -36,20 +37,21 @@ const callback = (req, res) => {
     const tokenSecret = oauth_secrets[token];
     const chat_id = chat_ids[token];
     const verifier = query.oauth_verifier;
+
     oauth.getOAuthAccessToken(token, tokenSecret, verifier, (error, accessToken, accessTokenSecret, results) => {
       chatModel.findOne({ telegram_id: chat_id })
       .exec((err, chat) => {
-          if (!chat || err) {
-              return;
-          }
-          
-          chat.trello_accessToken = accessToken;
-          chat.trello_accessTokenSecret = accessTokenSecret;
-          chat.save()
-              .then(() => console.log(`Update trello credentials for chat ${chat_id}.`));
+        if (!chat || err) {
+          return;
+        }
+        
+        chat.trello_accessToken = accessToken;
+        chat.trello_accessTokenSecret = accessTokenSecret;
+        chat.save()
+          .then(() => console.log(`Trello credentials for chat ${chat_id} updated.`));
       });
 
-      oauth.getProtectedResource('https://api.trello.com/1/members/me', 'GET', accessToken, accessTokenSecret, (error, data, response) => {
+      oauth.get('https://api.trello.com/1/members/me', accessToken, accessTokenSecret, (error, data, response) => {
         data = JSON.parse(data);
         res.send(`Hi ${data.fullName}, <br />
         you are successfuly authenticated. <br />
@@ -75,6 +77,7 @@ const createBoardRequest = async (chatId, boardName) => {
     const list = await createList('Backlog', board.id, credentials);
 
     const boardDb = await new boardModel({
+      _chat: chat._id,
       id: board.id,
       name: board.name
     }).save();
@@ -94,7 +97,7 @@ const createCardRequest = async (chatId, boardName, name, desc, assignees, due_o
     if (!chat) {
       throw(new Error('This chat is not registered, please use the /setup command and configure the integrations.'));
     }
-    const board = await boardModel.findOne({ name: boardName });
+    const board = await boardModel.findOne({ _chat: chat._id, name: boardName });
     if (!board) {
       throw(new Error(`Card can't be created, please verify that the '${boardName}' board exists.`));
     }
@@ -151,7 +154,7 @@ const getCardsRequest = async (chatId, boardName) => {
     if (!chat) {
       throw(new Error('This chat is not registered, please use the /setup command and configure the integrations.'));
     }
-    const board = await boardModel.findOne({ name: boardName });
+    const board = await boardModel.findOne({ _chat: chat._id, name: boardName });
     if (!board) {
       throw(new Error(`Cards can't be fetched, please verify that the '${boardName}' board exists.`));
     }

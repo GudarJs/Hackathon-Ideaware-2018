@@ -8,16 +8,25 @@ class Settings {
 
     static getConfig() {
         return {
+            appName: 'Scrum Android18 Bot',
             telegram: {
                 token: process.env.TELEGRAM_TOKEN,
             },
             trello: {
-                api_key: process.env.TRELLO_API_KEY,
-                api_secret: process.env.TRELLO_API_SECRET
+                apiKey: process.env.TRELLO_API_KEY,
+                apiSecret: process.env.TRELLO_API_SECRET,
+                requestURL: 'https://trello.com/1/OAuthGetRequestToken',
+                accessURL: 'https://trello.com/1/OAuthGetAccessToken',
+                authorizeURL: 'https://trello.com/1/OAuthAuthorizeToken',
+                loginCallback: 'http://localhost:3000/trello-callback',
             },
             github: {
-                client_id: process.env.GITHUB_CLIENT_ID,
-                client_secret: process.env.GITHUB_CLIENT_SECRET
+                clientId: process.env.GITHUB_CLIENT_ID,
+                clientSecret: process.env.GITHUB_CLIENT_SECRET,
+                baseURL: 'http://localhost:3000',
+                loginURI: '/github-login',
+                callbackURI: '/github-callback',
+                scope: 'repo',
             }
         }
     };

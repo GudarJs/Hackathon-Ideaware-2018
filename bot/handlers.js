@@ -57,7 +57,8 @@ const moveIssuesHandler = async (message, props) => {
         const boardName = board.replace('_', ' ');
         const chatId = message.from.id;
 
-        const issues = await githubapi.getIssuesFromResporitory(owner, repository);
+        message.reply.text(`Fetching issues from '${repository}' repository by '${owner}'`);
+        const issues = await githubapi.getIssuesFromResporitory(chatId, owner, repository);
         const cards = await trelloapi.getCardsRequest(chatId, boardName);
 
         const issuesToAdd = issues.filter((issue) => {
@@ -73,6 +74,10 @@ const moveIssuesHandler = async (message, props) => {
             return issue === undefined;
         });
         
+        if (issuesToAdd.length === 0 && cardsToDelete.length === 0) {
+            message.reply.text('You are up to date. No need for syncing.');
+            return;
+        }
         message.reply.text(`Moving ${issuesToAdd.length} issues from github to trello.
 Closing ${cardsToDelete.length} from trello (issues not finded on github).`
         );
@@ -85,7 +90,7 @@ Closing ${cardsToDelete.length} from trello (issues not finded on github).`
                 due_date = issue.milestone.due_on;
             }
             if (issue.comments > 0) {
-                comments = await githubapi.getCommentsFromIssue(owner, repository, issue.number);
+                comments = await githubapi.getCommentsFromIssue(chatId, owner, repository, issue.number);
             }
 
             await trelloapi.createCardRequest(chatId, boardName, issue.title, `${issue.body}\n\n${issue.html_url}`, issue.assignees, due_date, comments);
@@ -94,7 +99,7 @@ Closing ${cardsToDelete.length} from trello (issues not finded on github).`
             const card = cardsToDelete[index];
             await trelloapi.deleteCardRequest(chatId, card.id);
         }
-        message.reply.text('Issues moved to trello from github.');
+        message.reply.text('Sync completed successfully.');
     } catch (e) {
         console.error('Error:', e.message);
         if (e.response) { console.error('Data:', e.response.data); }

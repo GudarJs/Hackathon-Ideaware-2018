@@ -1,16 +1,27 @@
 const axios = require('axios');
 const githubOAuth = require('github-oauth');
 
+const Settings = require('../../settings');
 const chatModel = require('../models/chat');
-const boardModel = require('../models/board');
 
+
+const config = Settings.getConfig();
+const {
+  clientId,
+  clientSecret,
+  baseURL,
+  loginURI,
+  callbackURI,
+  scope,
+} = config.github;
 
 const oauth = githubOAuth({
-  githubClient: process.env.GITHUB_CLIENT_ID,
-  githubSecret: process.env.GITHUB_CLIENT_SECRET,
-  baseURL: 'http://localhost:3000',
-  loginURI: '/github-login',
-  callbackURI: '/github-callback'
+  githubClient: clientId,
+  githubSecret: clientSecret,
+  baseURL: baseURL,
+  loginURI: loginURI,
+  callbackURI: callbackURI,
+  scope: scope,
 });
 
 const chat_ids = {};
@@ -40,15 +51,20 @@ oauth.on('token', function(token, serverResponse) {
     
     chat.github_access_token = token.access_token;
     chat.save()
-      .then(() => console.log(`Update github credentials for chat ${chat_id}.`));
+      .then(() => console.log(`Github credentials for chat ${chat_id} updated.`));
   });
 
   serverResponse.send(token);
 });
 
-const getIssuesFromResporitory = async (owner, repository) => {
+const getIssuesFromResporitory = async (chatId, owner, repository) => {
   try {
-    const response = await axios.get(`https://api.github.com/repos/${owner}/${repository}/issues`);
+    const chat = await chatModel.findOne({ telegram_id: chatId });
+    if (!chat) {
+      throw(new Error('This chat is not registered, please use the /setup command and configure the integrations.'));
+    }
+    console.log(`https://api.github.com/repos/${owner}/${repository}/issues?access_token=${chat.github_access_token}`)
+    const response = await axios.get(`https://api.github.com/repos/${owner}/${repository}/issues?access_token=${chat.github_access_token}`);
 
     // Filter issues that are pull request
     // because the api endpoint give us issues + pull requests.
@@ -60,9 +76,13 @@ const getIssuesFromResporitory = async (owner, repository) => {
   }
 };
 
-const getCommentsFromIssue = async (owner, repository, idIssue) => {
+const getCommentsFromIssue = async (chatId, owner, repository, idIssue) => {
   try {
-    const response = await axios.get(`https://api.github.com/repos/${owner}/${repository}/issues/${idIssue}/comments`);
+    const chat = await chatModel.findOne({ telegram_id: chatId });
+    if (!chat) {
+      throw(new Error('This chat is not registered, please use the /setup command and configure the integrations.'));
+    }
+    const response = await axios.get(`https://api.github.com/repos/${owner}/${repository}/issues/${idIssue}/comments?access_token=${chat.github_access_token}`);
     return response.data;
   } catch (e) {
     throw(e);
