@@ -2,7 +2,7 @@ const express = require('express');
 const trello = require('./controllers/trello');
 const github = require('./controllers/github');
 
-// TODO: Implement express-session
+
 class HttpServer {
     constructor(port) {
         this.port = port;
@@ -10,7 +10,7 @@ class HttpServer {
     }
 
     listen() {
-        this.app.listen(this.port, () => {
+        this.server = this.app.listen(this.port, () => {
             console.log('HTTP server up and running...🏃🏃🏻');
             console.log(`Listening on port ${this.port}`);
         });
@@ -20,6 +20,10 @@ class HttpServer {
         this.app.get('/trello-callback', trello.callback);
         this.app.get('/github-login/:chat_id', github.login);
         this.app.get('/github-callback', github.callback);
+    }
+
+    close() {
+        this.server.close();
     }
 }
 

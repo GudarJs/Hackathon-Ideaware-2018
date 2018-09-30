@@ -1,7 +1,7 @@
 {
   "name": "scrum-android-18-bot",
   "version": "1.0.0",
-  "description": "",
+  "description": "Telegram bot to move issues from a Github repository to a Trello board.",
   "main": "index.js",
   "dependencies": {
     "axios": "^0.18.0",
@@ -13,12 +13,18 @@
     "telebot": "^1.2.6"
   },
   "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^5.2.0",
     "nodemon": "^1.18.4"
   },
   "scripts": {
     "start": "nodemon index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha --recursive || true"
   },
-  "author": "",
-  "license": "MIT"
+  "author": "Guzmán D. Darío",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GudarJs/Hackathon-Ideaware-2018"
+  }
 }
