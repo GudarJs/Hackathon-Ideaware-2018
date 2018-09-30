@@ -56,6 +56,34 @@ Start the project:
 
 - npm start
 
+How to run tests?
+------------------
+
+Please verify you have installed in your computer the following dependencies:
+
+- node >= 8.12.0
+- npm >= 6.4.1
+
+Download the bot server repository:
+
+- git clone https://github.com/GudarJs/Hackathon-Ideaware-2018  
+- cd Hackathon-Ideaware-2018
+
+Now setup the testing environment:
+
+- npm install
+- npm install -g mocha
+
+Set environment variables:
+
+Copy the .env.example and then replace the .env file with your keys.
+
+- cp .env.example .env
+
+Run project tests:
+
+- npm test
+
 How to use the bot?
 ---------------------
 
