@@ -38,20 +38,17 @@ Please verify you have installed in your computer the following dependencies:
 
 Download the bot server repository:
 
-.. highlight:: bash
-    git clone https://github.com/GudarJs/Hackathon-Ideaware-2018
-    cd Hackathon-Ideaware-2018
+git clone https://github.com/GudarJs/Hackathon-Ideaware-2018  
+cd Hackathon-Ideaware-2018
 
 Now setup the development environment:
 
-.. highlight:: bash
-    npm install
-    npm install -g nodemon
+npm install  
+npm install -g nodemon
 
 Start the project:
 
-.. highlight:: bash
-    npm start
+npm start
 
 How to use the bot?
 ---------------------
