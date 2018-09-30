@@ -46,6 +46,12 @@ Now setup the development environment:
 - npm install
 - npm install -g nodemon
 
+Set environment variables:
+
+Copy the .env.example and then replace the .env file with your keys.
+
+- cp .env.example .env
+
 Start the project:
 
 - npm start
