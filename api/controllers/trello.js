@@ -132,6 +132,27 @@ const createCardRequest = async (chatId, boardName, name, desc, assignees, due_o
   }
 }
 
+const getListId = async (chatId, boardName) => {
+  try {
+    const chat = await chatModel.findOne({ telegram_id: chatId });
+    if (!chat) {
+      throw(new Error('This chat is not registered, please use the /setup command and configure the integrations.'));
+    }
+    const board = await boardModel.findOne({ _chat: chat._id, name: boardName });
+    if (!board) {
+      throw(new Error(`Please verify that the '${boardName}' board exists.`));
+    }
+    const list = await listModel.findOne({ _board: board._id });
+    if (!list) {
+      throw(new Error('Please verify that the \'Backlog\' list exists.'));
+    }
+
+    return list.id;
+  } catch(e) {
+    throw(e);
+  }
+}
+
 const deleteCardRequest = async (chatId, id) => {
   try {
     const chat = await chatModel.findOne({ telegram_id: chatId });
@@ -288,4 +309,5 @@ module.exports = {
     createCardRequest,
     deleteCardRequest,
     getCardsRequest,
+    getListId,
 };

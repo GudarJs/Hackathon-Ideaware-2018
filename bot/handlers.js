@@ -60,7 +60,7 @@ const moveIssuesHandler = async (message, props) => {
         message.reply.text(`Fetching issues from '${repository}' repository by '${owner}'`);
         let issues = await githubapi.getIssuesFromResporitory(chatId, owner, repository);
         let cards = await trelloapi.getCardsRequest(chatId, boardName);
-        const issuesToCompare = [];
+        let issuesToCompare = [];
 
         const regex1 = /https[:a-z./0-9?_=&]+/g
         const regex2 = /rel[="a-z]+/g
@@ -131,12 +131,15 @@ const moveIssuesHandler = async (message, props) => {
         }
 
         cards = await trelloapi.getCardsRequest(chatId, boardName);
+        const listId = await trelloapi.getListId(chatId, boardName);
         const cardsToDelete = cards.filter((card) => {
             const issue = issuesToCompare.find((issue) => {
                 return issue.title === card.name;
             });
-            return issue === undefined;
+            console.log(card.idList, listId, card.idList === listId)
+            return issue === undefined && card.idList === listId;
         });
+        issuesToCompare = [];
 
         message.reply.text(`Closing ${cardsToDelete.length} from trello (issues not finded on github).`);
 
