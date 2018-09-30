@@ -1,6 +1,6 @@
 # Scrum Android18 Bot
 
-![GudarJS Pycon Profile](images/profile.jpg)
+![Ideaware Hackathon 2018](images/banner.jpg)
 
 Telegram bot to move issues from a Github repository to a Trello board.
 
